@@ -32,7 +32,8 @@ namespace AngularProjectAPI.Models
                 new Tag { Name = "Sport" },
                 new Tag { Name = "Film" },
                 new Tag { Name = "Reizen" },
-                new Tag { Name = "Games" }
+                new Tag { Name = "Games" },
+                new Tag { Name = "Buitenland" }
                 );
 
             context.ArticleStatuses.AddRange(
