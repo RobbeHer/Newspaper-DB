@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using AngularProjectAPI.Data;
 using AngularProjectAPI.Models;
 using AngularProjectAPI.Services;
+using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols;
 
 namespace AngularProjectAPI.Controllers
 {
@@ -16,6 +21,9 @@ namespace AngularProjectAPI.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private static string connectionString = "Server=(localdb)\\mssqllocaldb;Database=aspnet-AngularAPI-F532DF6B-C09A-4528-B535-CAD19D110ECE;Trusted_Connection=True;MultipleActiveResultSets=true";
+        private static IDbConnection db = new SqlConnection(connectionString);
+
         private IUserService _userService;
         private readonly NewsContext _context;
 
@@ -51,6 +59,13 @@ namespace AngularProjectAPI.Controllers
                 return BadRequest(new { message = "Username or password is incorrect" });
 
             return Ok(user);
+        }
+
+        [HttpGet("journalist")]
+        public async Task<ActionResult<IEnumerable<User>>> Journalist()
+        {
+            string sql = "select u.* from \"user\" u join role r on u.roleid = r.roleid where r.name = 'journalist'";
+            return (List<User>)db.Query<User>(sql);
         }
 
         [HttpDelete("{id}")]
