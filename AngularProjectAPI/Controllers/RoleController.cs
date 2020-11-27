@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AngularProjectAPI.Data;
 using AngularProjectAPI.Models;
+using System.Data;
+using Microsoft.Data.SqlClient;
+using Dapper;
 
 namespace AngularProjectAPI.Controllers
 {
@@ -14,6 +17,9 @@ namespace AngularProjectAPI.Controllers
     [ApiController]
     public class RoleController : ControllerBase
     {
+        private static string connectionString = "Server=(localdb)\\mssqllocaldb;Database=aspnet-AngularAPI-F532DF6B-C09A-4528-B535-CAD19D110ECE;Trusted_Connection=True;MultipleActiveResultSets=true";
+        private static IDbConnection db = new SqlConnection(connectionString);
+
         private readonly NewsContext _context;
 
         public RoleController(NewsContext context)
@@ -26,6 +32,14 @@ namespace AngularProjectAPI.Controllers
         public async Task<ActionResult<IEnumerable<Role>>> GetRoles()
         {
             return await _context.Roles.ToListAsync();
+        }
+
+        [HttpGet("journalist")]
+        public async Task<ActionResult<Role>> Journalist()
+        {
+            string sql = "select * from \"role\" where name = 'journalist'";
+            List<Role> role = (List<Role>)db.Query<Role>(sql);
+            return role[0];
         }
 
         // GET: api/Role/5
