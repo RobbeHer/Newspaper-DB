@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AngularProjectAPI.Data;
 using AngularProjectAPI.Models;
+using System.Data;
+using Microsoft.Data.SqlClient;
+using Dapper;
 
 namespace AngularProjectAPI.Controllers
 {
@@ -14,6 +17,9 @@ namespace AngularProjectAPI.Controllers
     [ApiController]
     public class ArticleController : ControllerBase
     {
+        //private static string connectionString = "Server=(localdb)\\mssqllocaldb;Database=aspnet-AngularAPI-F532DF6B-C09A-4528-B535-CAD19D110ECE;Trusted_Connection=True;MultipleActiveResultSets=true";
+        //private static IDbConnection db = new SqlConnection(connectionString);
+        
         private readonly NewsContext _context;
 
         public ArticleController(NewsContext context)
@@ -28,11 +34,37 @@ namespace AngularProjectAPI.Controllers
             return await _context.Articles.ToListAsync();
         }
 
+        [HttpGet("articles-of-status/{status}")]
+        public async Task<ActionResult<IEnumerable<Article>>> ArticlesOfStatus(String status)
+        {
+            var articles = await _context.Articles.Include("User").Include("Tag").Include("ArticleStatus").Where(s => s.ArticleStatus.Name == status).ToListAsync();
+
+            if (articles == null)
+            {
+                return NotFound();
+            }
+
+            return articles;
+        }
+
+        [HttpGet("articles-of-user/{id}")]
+        public async Task<ActionResult<IEnumerable<Article>>> ArticlesOfUser(int id)
+        {
+            var articles = await _context.Articles.Include("User").Include("Tag").Include("ArticleStatus").Where(s => s.UserID == id).ToListAsync();
+
+            if (articles == null)
+            {
+                return NotFound();
+            }
+
+            return articles;
+        }
+
         // GET: api/Article/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Article>> GetArticle(int id)
         {
-            var article = await _context.Articles.FindAsync(id);
+            var article = await _context.Articles.Include("Tag").SingleOrDefaultAsync(x => x.ArticleID == id);
 
             if (article == null)
             {

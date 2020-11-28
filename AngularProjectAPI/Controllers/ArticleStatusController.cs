@@ -28,6 +28,19 @@ namespace AngularProjectAPI.Controllers
             return await _context.ArticleStatuses.ToListAsync();
         }
 
+        [HttpGet("status-id-of/{name}")]
+        public async Task<ActionResult<ArticleStatus>> StatusIdOf(String name)
+        {
+            var ArticleStatus = await _context.ArticleStatuses.SingleOrDefaultAsync(x => x.Name == name);
+
+            if (ArticleStatus == null)
+            {
+                return NotFound();
+            }
+
+            return ArticleStatus;
+        }
+
         // GET: api/ArticleStatus/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ArticleStatus>> GetArticleStatus(int id)

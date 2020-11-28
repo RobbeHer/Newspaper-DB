@@ -17,8 +17,8 @@ namespace AngularProjectAPI.Controllers
     [ApiController]
     public class RoleController : ControllerBase
     {
-        private static string connectionString = "Server=(localdb)\\mssqllocaldb;Database=aspnet-AngularAPI-F532DF6B-C09A-4528-B535-CAD19D110ECE;Trusted_Connection=True;MultipleActiveResultSets=true";
-        private static IDbConnection db = new SqlConnection(connectionString);
+        //private static string connectionString = "Server=(localdb)\\mssqllocaldb;Database=aspnet-AngularAPI-F532DF6B-C09A-4528-B535-CAD19D110ECE;Trusted_Connection=True;MultipleActiveResultSets=true";
+        //private static IDbConnection db = new SqlConnection(connectionString);
 
         private readonly NewsContext _context;
 
@@ -37,9 +37,14 @@ namespace AngularProjectAPI.Controllers
         [HttpGet("role-of-type/{type}")]
         public async Task<ActionResult<Role>> RoleOfType(String type)
         {
-            string sql = "select * from \"role\" where name = '" + type + "'";
-            List<Role> role = (List<Role>)db.Query<Role>(sql);
-            return role[0];
+            var role = await _context.Roles.SingleOrDefaultAsync(x => x.Name == type);
+
+            if (role == null)
+            {
+                return NotFound();
+            }
+
+            return role;
         }
 
         // GET: api/Role/5

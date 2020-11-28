@@ -21,10 +21,10 @@ namespace AngularProjectAPI.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private static string connectionString = "Server=(localdb)\\mssqllocaldb;Database=aspnet-AngularAPI-F532DF6B-C09A-4528-B535-CAD19D110ECE;Trusted_Connection=True;MultipleActiveResultSets=true";
-        private static IDbConnection db = new SqlConnection(connectionString);
+        //private static string connectionString = "Server=(localdb)\\mssqllocaldb;Database=aspnet-AngularAPI-F532DF6B-C09A-4528-B535-CAD19D110ECE;Trusted_Connection=True;MultipleActiveResultSets=true";
+        //private static IDbConnection db = new SqlConnection(connectionString);
 
-        private IUserService _userService;
+        private readonly IUserService _userService;
         private readonly NewsContext _context;
 
         public UserController(IUserService userService, NewsContext context)
@@ -105,11 +105,17 @@ namespace AngularProjectAPI.Controllers
             return Ok(user);
         }
 
-        [HttpGet("journalist")]
-        public async Task<ActionResult<IEnumerable<User>>> Journalist()
+        [HttpGet("users-of-type/{type}")]
+        public async Task<ActionResult<IEnumerable<User>>> UsersOfType(String type)
         {
-            string sql = "select u.* from \"user\" u join role r on u.roleid = r.roleid where r.name = 'journalist'";
-            return (List<User>)db.Query<User>(sql);
+            var users = await _context.Users.Include("Role").Where(x => x.Role.Name == type).ToListAsync();
+
+            if (users == null)
+            {
+                return NotFound();
+            }
+
+            return users;
         }
 
         [HttpDelete("{id}")]
