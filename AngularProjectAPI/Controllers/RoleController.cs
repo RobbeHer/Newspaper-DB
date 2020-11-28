@@ -34,10 +34,10 @@ namespace AngularProjectAPI.Controllers
             return await _context.Roles.ToListAsync();
         }
 
-        [HttpGet("journalist")]
-        public async Task<ActionResult<Role>> Journalist()
+        [HttpGet("role-of-type/{type}")]
+        public async Task<ActionResult<Role>> RoleOfType(String type)
         {
-            string sql = "select * from \"role\" where name = 'journalist'";
+            string sql = "select * from \"role\" where name = '" + type + "'";
             List<Role> role = (List<Role>)db.Query<Role>(sql);
             return role[0];
         }
