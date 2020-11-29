@@ -64,9 +64,37 @@ namespace AngularProjectAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Article>> GetArticle(int id)
         {
-            var article = await _context.Articles.Include("Tag").SingleOrDefaultAsync(x => x.ArticleID == id);
+            var article = await _context.Articles.Include("User").Include("Tag").Include("ArticleStatus").SingleOrDefaultAsync(x => x.ArticleID == id);
+
+            if (article == null || article.ArticleStatus.Name != "Published")
+            {
+                return NotFound();
+            }
+
+            return article;
+        }
+
+        // GET: api/Article/edit/5
+        [HttpGet("edit/{id}")]
+        public async Task<ActionResult<Article>> GetEditArticle(int id)
+        {
+            var article = await _context.Articles.Include("User").Include("Tag").Include("ArticleStatus").SingleOrDefaultAsync(x => x.ArticleID == id);
 
             if (article == null)
+            {
+                return NotFound();
+            }
+
+            return article;
+        }
+
+        // GET: api/Article/review/5
+        [HttpGet("review/{id}")]
+        public async Task<ActionResult<Article>> GetReviewArticle(int id)
+        {
+            var article = await _context.Articles.Include("User").Include("Tag").Include("ArticleStatus").SingleOrDefaultAsync(x => x.ArticleID == id);
+
+            if (article == null || article.ArticleStatus.Name != "To review")
             {
                 return NotFound();
             }
