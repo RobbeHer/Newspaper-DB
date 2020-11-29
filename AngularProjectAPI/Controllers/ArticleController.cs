@@ -86,6 +86,19 @@ namespace AngularProjectAPI.Controllers
             return articles;
         }
 
+        [HttpGet("published-articles-with-filter/{filter}")]
+        public async Task<ActionResult<IEnumerable<Article>>> ArticlesWithFilter(string filter)
+        {
+            var articles = await _context.Articles.Include("User").Include("Tag").Include("ArticleStatus").Where(x => x.ArticleStatus.Name == "Published" && (x.Title.Contains(filter) || x.SubTitle.Contains(filter) || x.ShortSummary.Contains(filter))).ToListAsync();
+
+            if (articles == null)
+            {
+                return NotFound();
+            }
+
+            return articles;
+        }
+
         // GET: api/Article/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Article>> GetArticle(int id)
