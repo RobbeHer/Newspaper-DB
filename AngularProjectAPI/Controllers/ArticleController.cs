@@ -34,6 +34,19 @@ namespace AngularProjectAPI.Controllers
             return await _context.Articles.ToListAsync();
         }
 
+        [HttpGet("published-articles")]
+        public async Task<ActionResult<IEnumerable<Article>>> PublishedArticles()
+        {
+            var articles = await _context.Articles.Include("User").Include("Tag").Include("ArticleStatus").Where(s => s.ArticleStatus.Name == "Published").ToListAsync();
+
+            if (articles == null)
+            {
+                return NotFound();
+            }
+
+            return articles;
+        }
+
         [HttpGet("articles-of-status/{status}")]
         public async Task<ActionResult<IEnumerable<Article>>> ArticlesOfStatus(String status)
         {
@@ -80,7 +93,7 @@ namespace AngularProjectAPI.Controllers
         {
             var article = await _context.Articles.Include("User").Include("Tag").Include("ArticleStatus").SingleOrDefaultAsync(x => x.ArticleID == id);
 
-            if (article == null)
+            if (article == null || article.ArticleStatus.Name == "To review")
             {
                 return NotFound();
             }
