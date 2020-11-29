@@ -37,7 +37,7 @@ namespace AngularProjectAPI.Controllers
         [HttpGet("published-articles")]
         public async Task<ActionResult<IEnumerable<Article>>> PublishedArticles()
         {
-            var articles = await _context.Articles.Include("User").Include("Tag").Include("ArticleStatus").Where(s => s.ArticleStatus.Name == "Published").ToListAsync();
+            var articles = await _context.Articles.Include("User").Include("Tag").Include("ArticleStatus").Where(x => x.ArticleStatus.Name == "Published").ToListAsync();
 
             if (articles == null)
             {
@@ -50,7 +50,20 @@ namespace AngularProjectAPI.Controllers
         [HttpGet("articles-of-status/{status}")]
         public async Task<ActionResult<IEnumerable<Article>>> ArticlesOfStatus(String status)
         {
-            var articles = await _context.Articles.Include("User").Include("Tag").Include("ArticleStatus").Where(s => s.ArticleStatus.Name == status).ToListAsync();
+            var articles = await _context.Articles.Include("User").Include("Tag").Include("ArticleStatus").Where(x => x.ArticleStatus.Name == status).ToListAsync();
+
+            if (articles == null)
+            {
+                return NotFound();
+            }
+
+            return articles;
+        }
+
+        [HttpGet("published-articles-with-tag/{tag}")]
+        public async Task<ActionResult<IEnumerable<Article>>> ArticlesWithTag(String tag)
+        {
+            var articles = await _context.Articles.Include("User").Include("Tag").Include("ArticleStatus").Where(x => x.ArticleStatus.Name == "Published" && x.Tag.Name == tag).ToListAsync();
 
             if (articles == null)
             {
